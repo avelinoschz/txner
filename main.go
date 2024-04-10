@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"go.uber.org/zap"
+)
 
 func main() {
-	fmt.Println("hello world")
+	logger, err := zap.NewProduction()
+	if err != nil {
+		panic("failed to initizalize logger")
+	}
+	logger.Info("logger is ready")
 }
