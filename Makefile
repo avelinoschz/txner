@@ -19,6 +19,7 @@ setup:
 ensure-docker:
 	@if ! docker info >/dev/null 2>&1; then \
 		echo "Docker is not available. Please ensure Docker is installed and running."; \
+		exit 1; \
 	fi
 
 .PHONY: dev-db-status
