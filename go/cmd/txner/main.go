@@ -34,4 +34,11 @@ func main() {
 		}
 		fmt.Println()
 	}
+
+	// file reader returns records
+
+	// txner applies business and save
+	// emit events
+
+	// mailer sends mail
 }
