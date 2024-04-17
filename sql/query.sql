@@ -1,11 +1,11 @@
 -- name: GetAccountByID :one
 SELECT
-    *
+  *
 FROM
-    accounts
+  accounts
 WHERE
-    id = $1
+  id = $1
 ORDER BY
-    created_at DESC
+  created_at DESC
 LIMIT
-    1;
+  1;
