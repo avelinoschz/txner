@@ -1,4 +1,5 @@
 INSTALL_BIN_DIR := $(CURDIR)/bin
+BUILD_TARGET_DIR := $(CURDIR)/generated/bin
 SQL_DIR := $(CURDIR)/sql
 
 export GOBIN := $(INSTALL_BIN_DIR)
@@ -99,4 +100,10 @@ connect-dev-db: check-psql
 format-sql: # TODO apply on multiple query files
 	npx sql-formatter $(SQL_DIR)/query.sql --config $(SQL_DIR)/formatter/config.json --fix 
 
+.PHONY: build-go
+build-go:
+	CGO_ENABLED=0 go build -o $(BUILD_TARGET_DIR)/go/cmd/txner $(CURDIR)/go/cmd/txner/
 
+.PHONY:
+run-go: build-go
+	$(BUILD_TARGET_DIR)/go/cmd/txner
