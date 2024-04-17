@@ -23,9 +23,9 @@ setup-go:
 setup-node:
 	npm install sql-formatter
 
-.PHONY: lint-sql
-lint-sql:
-	npx sql-formatter -h
+.PHONY: format-sql
+format-sql: # TODO apply on multiple query files
+	npx sql-formatter $(SQL_DIR)/query.sql --config $(SQL_DIR)/formatter/config.json --fix 
 
 .PHONY: ensure-docker
 ensure-docker:
@@ -95,10 +95,6 @@ dump-db-schema:
 .PHONY: connect-dev-db
 connect-dev-db: check-psql
 	psql -h localhost -p $(DEV_DB_POSTGRESQL_PORT) -U postgres $(DEV_DB_POSTGRESQL_NAME)
-
-.PHONY: format-sql
-format-sql: # TODO apply on multiple query files
-	npx sql-formatter $(SQL_DIR)/query.sql --config $(SQL_DIR)/formatter/config.json --fix 
 
 .PHONY: build-go
 build-go:
