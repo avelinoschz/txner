@@ -1,4 +1,5 @@
 INSTALL_BIN_DIR := $(CURDIR)/bin
+SQL_DIR := $(CURDIR)/sql
 
 export GOBIN := $(INSTALL_BIN_DIR)
 
@@ -12,10 +13,18 @@ DEV_DB_BASE_POSTGRESQL_URL := postgres://postgres@localhost:$(DEV_DB_POSTGRESQL_
 DEV_DB_POSTGRESQL_NAME := txner
 DEV_DB_POSTGRESQL_URL := postgres://postgres@localhost:$(DEV_DB_POSTGRESQL_PORT)/$(DEV_DB_POSTGRESQL_NAME)?sslmode=disable
 
-.PHONY: setup-deps
-setup-deps:
+.PHONY: setup-go
+setup-go:
 	go install github.com/kyleconroy/sqlc/cmd/sqlc@$(SQLC_VERSION)
 	go install -tags='no_mysql no_sqlite3 no_ydb' github.com/pressly/goose/v3/cmd/goose@$(GOOSE_VERSION)
+
+.PHONY: setup-node
+setup-node:
+	npm install sql-formatter
+
+.PHONY: lint-sql
+lint-sql:
+	npx sql-formatter -h
 
 .PHONY: ensure-docker
 ensure-docker:
@@ -30,7 +39,7 @@ dev-db-status:
 	"$(INSTALL_BIN_DIR)/goose" -dir "$(CURDIR)/sql/migrations" postgres "${DATABASE_URL}" status
 
 .PHONY: dev-db-migrate
-dev-db-migrate: ## TODO target a specific migration version.
+dev-db-migrate: # TODO target a specific migration version.
 dev-db-migrate: export DATABASE_URL=$(DEV_DB_POSTGRESQL_URL)
 dev-db-migrate:
 	"$(INSTALL_BIN_DIR)/goose" -dir "$(CURDIR)/sql/migrations" postgres "${DATABASE_URL}" up
@@ -68,6 +77,7 @@ stop-dev-db: ensure-docker
 check-psql:
 	@if ! psql --version >/dev/null 2>&1; then \
 		echo "psql is not installed. Please install PostgreSQL client."; \
+		exit 1; \
 	fi
 
 .PHONY: dump-db-schema
@@ -84,3 +94,9 @@ dump-db-schema:
 .PHONY: connect-dev-db
 connect-dev-db: check-psql
 	psql -h localhost -p $(DEV_DB_POSTGRESQL_PORT) -U postgres $(DEV_DB_POSTGRESQL_NAME)
+
+.PHONY: format-sql
+format-sql: # TODO apply on multiple query files
+	npx sql-formatter $(SQL_DIR)/query.sql --config $(SQL_DIR)/formatter/config.json --fix 
+
+
